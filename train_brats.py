@@ -11,12 +11,14 @@ from losses import *
 from extract_patches import *
 from data_generator import DataGenerator
 from dense_unet import Dense_Unet
+from models import *
 
 import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
 
 config = tf.ConfigProto()
-config.gpu_options.allow_growth = True
+#config.gpu_options.allow_growth = True
+config.gpu_options.per_process_gpu_memory_fraction = 0.5
 config.gpu_options.visible_device_list = "2"
 set_session(tf.Session(config=config))
 
@@ -51,8 +53,8 @@ class Training(object):
                                                                                 'dice_en_metric': dice_en_metric})
             print("pre-trained model loaded!")
         else:
-            unet = Dense_Unet(img_shape=(256, 256, 4))
-            self.model = unet.compile_dense()
+            #unet = Dense_Unet(img_shape=(256, 256, 4))
+            self.model = FCN_Vgg16_32s(input_shape = (128, 128, 4), classes = 4)
             #self.model.load_weights('/home/parth/Interpretable_ML/Brain-tumor-segmentation/checkpoints/U_densenet/U_densenet.25_0.573.hdf5')
             print("U-net CNN compiled!")
 
@@ -61,7 +63,7 @@ class Training(object):
         train_generator = train_gen
         val_generator = val_gen
         checkpointer = ModelCheckpoint(
-            filepath='/checkpoints/Xnet/X_net{epoch:02d}_{val_loss:.3f}.hdf5',
+            filepath='/checkpoints/FCNt/FCN{epoch:02d}_{val_loss:.3f}.hdf5',
             verbose=1, period=5)
         self.model.fit_generator(train_generator,
                                  epochs=self.nb_epoch, steps_per_epoch=100, validation_data=val_generator,
@@ -137,9 +139,9 @@ if __name__ == "__main__":
     train_generator = DataGenerator('/home/brats/parth/parth/_train/', batch_size=32)
     val_generator = DataGenerator('/home/brats/parth/parth/_val/', batch_size=32, val=True)
 
-    brain_seg.model.save('/home/parth/Interpretable_ML/Brain-tumor-segmentation/checkpoints/U_inception/U_inception.h5')
+    #brain_seg.model.save('/home/parth/Interpretable_ML/Brain-tumor-segmentation/checkpoints/FCN/FCN.h5')
 
-    #brain_seg.fit_unet(train_generator, val_generator)
+    brain_seg.fit_unet(train_generator, val_generator)
     #random.seed(7)
 '''
     for i in range(7, 25):
