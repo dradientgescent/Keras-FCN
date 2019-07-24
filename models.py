@@ -44,7 +44,7 @@ def FCN_Vgg16_32s(input_shape=None, weight_decay=0., batch_momentum=0.9, batch_s
         image_size = batch_shape[1:3]
     else:
         img_input = Input(shape=input_shape)
-        image_size = input_shape[0FCN_Vgg16_32s:2]
+        image_size = input_shape[0:2]
     # Block 1
     x = Conv2D(64, (3, 3), activation='relu', padding='same', name='block1_conv1', kernel_regularizer=l2(weight_decay))(img_input)
     x = Conv2D(64, (3, 3), activation='relu', padding='same', name='block1_conv2', kernel_regularizer=l2(weight_decay))(x)
